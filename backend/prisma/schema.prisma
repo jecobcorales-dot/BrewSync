@@ -1,0 +1,278 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  customer
+  cashier
+  manager
+  admin
+}
+
+enum OrderStatus {
+  pending
+  preparing
+  ready
+  completed
+  cancelled
+}
+
+enum MLAlgorithm {
+  collaborative_filtering
+  association_rules
+  random_forest
+  xgboost
+  ensemble
+}
+
+model Branch {
+  id           String     @id @default(uuid())
+  name         String
+  code         String     @unique
+  address      String
+  city         String
+  phone        String?
+  logoUrl      String?    @map("logo_url")
+  isActive     Boolean    @default(true) @map("is_active")
+  openingTime  String     @default("06:00") @map("opening_time")
+  closingTime  String     @default("22:00") @map("closing_time")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  employees    Employee[]
+  orders       Order[]
+  promotions   Promotion[]
+  salesReports SalesReport[]
+  customers    Customer[] @relation("FavoriteBranch")
+
+  @@map("branches")
+}
+
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String     @map("password_hash")
+  role         UserRole   @default(customer)
+  firstName    String     @map("first_name")
+  lastName     String     @map("last_name")
+  avatarUrl    String?    @map("avatar_url")
+  isActive     Boolean    @default(true) @map("is_active")
+  lastLogin    DateTime?  @map("last_login")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  customer     Customer?
+  employee     Employee?
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+model Customer {
+  id               String           @id
+  user             User             @relation(fields: [id], references: [id], onDelete: Cascade)
+  loyaltyPoints    Int              @default(0) @map("loyalty_points")
+  loyaltyTier      String           @default("Bronze") @map("loyalty_tier")
+  favoriteBranchId String?          @map("favorite_branch_id")
+  favoriteBranch   Branch?          @relation("FavoriteBranch", fields: [favoriteBranchId], references: [id])
+  totalOrders      Int              @default(0) @map("total_orders")
+  totalSpent       Decimal          @default(0) @map("total_spent") @db.Decimal(12, 2)
+  preferences      Json             @default("{}")
+  orders           Order[]
+  recommendations  Recommendation[]
+
+  @@map("customers")
+}
+
+model Employee {
+  id           String   @id
+  user         User     @relation(fields: [id], references: [id], onDelete: Cascade)
+  branchId     String?  @map("branch_id")
+  branch       Branch?  @relation(fields: [branchId], references: [id])
+  employeeCode String?  @unique @map("employee_code")
+  position     String?
+  hireDate     DateTime @default(now()) @map("hire_date") @db.Date
+  orders       Order[]  @relation("CashierOrders")
+
+  @@map("employees")
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  icon        String?
+  sortOrder   Int       @default(0) @map("sort_order")
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id           String        @id @default(uuid())
+  categoryId   String        @map("category_id")
+  category     Category      @relation(fields: [categoryId], references: [id])
+  name         String
+  slug         String        @unique
+  description  String?
+  price        Decimal       @db.Decimal(10, 2)
+  imageUrl     String?       @map("image_url")
+  calories     Int?
+  rating       Decimal       @default(4.5) @db.Decimal(3, 2)
+  reviewCount  Int           @default(0) @map("review_count")
+  isAvailable  Boolean       @default(true) @map("is_available")
+  isSeasonal   Boolean       @default(false) @map("is_seasonal")
+  isFeatured   Boolean       @default(false) @map("is_featured")
+  tags         String[]      @default([])
+  createdAt    DateTime      @default(now()) @map("created_at")
+  orderItems   OrderItem[]
+  recommendations Recommendation[]
+
+  @@index([categoryId])
+  @@map("products")
+}
+
+model AddOn {
+  id          String  @id @default(uuid())
+  name        String
+  price       Decimal @db.Decimal(10, 2)
+  category    String  @default("extra")
+  isAvailable Boolean @default(true) @map("is_available")
+
+  @@map("add_ons")
+}
+
+model Order {
+  id                  String      @id @default(uuid())
+  orderNumber         String      @unique @map("order_number")
+  customerId          String?     @map("customer_id")
+  customer            Customer?   @relation(fields: [customerId], references: [id])
+  branchId            String      @map("branch_id")
+  branch              Branch      @relation(fields: [branchId], references: [id])
+  cashierId           String?     @map("cashier_id")
+  cashier             Employee?   @relation("CashierOrders", fields: [cashierId], references: [id])
+  status              OrderStatus @default(pending)
+  subtotal            Decimal     @db.Decimal(12, 2)
+  tax                 Decimal     @default(0) @db.Decimal(12, 2)
+  total               Decimal     @db.Decimal(12, 2)
+  loyaltyPointsEarned Int         @default(0) @map("loyalty_points_earned")
+  notes               String?
+  createdAt           DateTime    @default(now()) @map("created_at")
+  updatedAt           DateTime    @updatedAt @map("updated_at")
+  items               OrderItem[]
+  transactions        Transaction[]
+
+  @@index([customerId])
+  @@index([branchId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String  @map("order_id")
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int     @default(1)
+  unitPrice Decimal @map("unit_price") @db.Decimal(10, 2)
+  subtotal  Decimal @db.Decimal(10, 2)
+  addOns    Json    @default("[]")
+
+  @@map("order_items")
+}
+
+model Transaction {
+  id            String   @id @default(uuid())
+  orderId       String   @map("order_id")
+  order         Order    @relation(fields: [orderId], references: [id])
+  amount        Decimal  @db.Decimal(12, 2)
+  paymentMethod String   @default("card") @map("payment_method")
+  status        String   @default("completed")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("transactions")
+}
+
+model Recommendation {
+  id              String      @id @default(uuid())
+  customerId      String      @map("customer_id")
+  customer        Customer    @relation(fields: [customerId], references: [id])
+  productId       String      @map("product_id")
+  product         Product     @relation(fields: [productId], references: [id])
+  algorithm       MLAlgorithm
+  confidenceScore Decimal     @map("confidence_score") @db.Decimal(5, 4)
+  reason          String?
+  isAccepted      Boolean?    @map("is_accepted")
+  createdAt       DateTime    @default(now()) @map("created_at")
+
+  @@index([customerId])
+  @@map("recommendations")
+}
+
+model Promotion {
+  id              String    @id @default(uuid())
+  title           String
+  description     String?
+  discountPercent Decimal?  @map("discount_percent") @db.Decimal(5, 2)
+  discountAmount  Decimal?  @map("discount_amount") @db.Decimal(10, 2)
+  code            String?   @unique
+  bannerUrl       String?   @map("banner_url")
+  startDate       DateTime? @map("start_date") @db.Date
+  endDate         DateTime? @map("end_date") @db.Date
+  isActive        Boolean   @default(true) @map("is_active")
+  branchId        String?   @map("branch_id")
+  branch          Branch?   @relation(fields: [branchId], references: [id])
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@map("promotions")
+}
+
+model MLModel {
+  id        String      @id @default(uuid())
+  name      String
+  algorithm MLAlgorithm
+  version   String
+  accuracy  Decimal?    @db.Decimal(5, 4)
+  isActive  Boolean     @default(false) @map("is_active")
+  trainedAt DateTime?   @map("trained_at")
+  metadata  Json        @default("{}")
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  @@map("ml_models")
+}
+
+model SalesReport {
+  id                           String   @id @default(uuid())
+  branchId                     String   @map("branch_id")
+  branch                       Branch   @relation(fields: [branchId], references: [id])
+  reportDate                   DateTime @map("report_date") @db.Date
+  totalRevenue                 Decimal  @default(0) @map("total_revenue") @db.Decimal(12, 2)
+  totalOrders                  Int      @default(0) @map("total_orders")
+  avgOrderValue                Decimal  @default(0) @map("avg_order_value") @db.Decimal(10, 2)
+  recommendationAcceptanceRate Decimal? @map("recommendation_acceptance_rate") @db.Decimal(5, 4)
+  createdAt                    DateTime @default(now()) @map("created_at")
+
+  @@unique([branchId, reportDate])
+  @@map("sales_reports")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?  @map("user_id")
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String
+  entityType String?  @map("entity_type")
+  entityId   String?  @map("entity_id")
+  details    Json     @default("{}")
+  ipAddress  String?  @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

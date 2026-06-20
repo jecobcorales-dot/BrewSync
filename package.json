@@ -1,0 +1,21 @@
+{
+  "name": "brewsync",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:all": "concurrently -n api,web,ml -c blue,green,magenta \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:ml\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:ml": "cd ml-service && python app.py",
+    "build": "cd frontend && npm run build",
+    "db:push": "cd backend && npx prisma db push",
+    "db:seed": "cd backend && node prisma/seed.js",
+    "db:seed:enterprise": "cd backend && node prisma/seed.js enterprise",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

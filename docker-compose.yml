@@ -1,0 +1,68 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: brewsync-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: brewsync
+      POSTGRES_PASSWORD: brewsync_secret
+      POSTGRES_DB: brewsync
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U brewsync']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: brewsync-api
+    restart: unless-stopped
+    ports:
+      - '5000:5000'
+    environment:
+      PORT: 5000
+      DATABASE_URL: postgresql://brewsync:brewsync_secret@postgres:5432/brewsync
+      JWT_SECRET: brewsync-production-jwt-secret-change-me
+      FRONTEND_URL: ${FRONTEND_URL:-https://brewsync.com}
+      ML_SERVICE_URL: http://ml-service:8000
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ml-service:
+        condition: service_started
+
+  ml-service:
+    build: ./ml-service
+    container_name: brewsync-ml
+    restart: unless-stopped
+    ports:
+      - '8000:8000'
+    environment:
+      ML_PORT: 8000
+    volumes:
+      - ml_models:/app/models
+
+  frontend:
+    build: ./frontend
+    container_name: brewsync-web
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://brewsync.com}
+      NEXT_PUBLIC_API_ORIGIN: ${NEXT_PUBLIC_API_ORIGIN:-https://api.brewsync.com}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:5000/api}
+      NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL:-http://localhost:5000}
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  ml_models:
