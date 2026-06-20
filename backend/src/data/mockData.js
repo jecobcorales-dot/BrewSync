@@ -73,10 +73,10 @@ const employees = [
 ];
 
 const orders = [
-  { id: 'o1', orderNumber: 'BS-2024-001847', customerId: 'u1', branchId: 'b1', cashierId: 'u2', status: 'completed', subtotal: 330, tax: 39.6, total: 369.6, loyaltyPointsEarned: 37, createdAt: '2024-06-15T08:30:00Z' },
-  { id: 'o2', orderNumber: 'BS-2024-001848', customerId: 'u1', branchId: 'b1', cashierId: 'u2', status: 'completed', subtotal: 260, tax: 31.2, total: 291.2, loyaltyPointsEarned: 29, createdAt: '2024-06-16T14:15:00Z' },
-  { id: 'o3', orderNumber: 'BS-2024-001849', customerId: 'u5', branchId: 'b2', cashierId: 'u2', status: 'preparing', subtotal: 445, tax: 53.4, total: 498.4, loyaltyPointsEarned: 50, createdAt: new Date().toISOString() },
-  { id: 'o4', orderNumber: 'BS-2024-001850', customerId: 'u1', branchId: 'b1', cashierId: 'u2', status: 'ready', subtotal: 195, tax: 23.4, total: 218.4, loyaltyPointsEarned: 22, createdAt: new Date(Date.now() - 600000).toISOString() },
+  { id: 'o1', orderNumber: 'BS-2026-001847', customerId: 'u1', branchId: 'b1', cashierId: 'u2', status: 'completed', subtotal: 330, tax: 39.6, total: 369.6, loyaltyPointsEarned: 37, createdAt: '2026-06-15T08:30:00Z' },
+  { id: 'o2', orderNumber: 'BS-2026-001848', customerId: 'u1', branchId: 'b1', cashierId: 'u2', status: 'completed', subtotal: 260, tax: 31.2, total: 291.2, loyaltyPointsEarned: 29, createdAt: '2026-06-16T14:15:00Z' },
+  { id: 'o3', orderNumber: 'BS-2026-001849', customerId: 'u5', branchId: 'b2', cashierId: 'u2', status: 'preparing', subtotal: 445, tax: 53.4, total: 498.4, loyaltyPointsEarned: 50, createdAt: new Date().toISOString() },
+  { id: 'o4', orderNumber: 'BS-2026-001850', customerId: 'u1', branchId: 'b1', cashierId: 'u2', status: 'ready', subtotal: 195, tax: 23.4, total: 218.4, loyaltyPointsEarned: 22, createdAt: new Date(Date.now() - 600000).toISOString() },
 ];
 
 const orderItems = [
@@ -91,24 +91,24 @@ const orderItems = [
 ];
 
 const promotions = [
-  { id: 'pr1', title: 'Happy Hour Brew', description: '20% off all iced drinks 2-5 PM', discountPercent: 20, code: 'HAPPY20', bannerUrl: '/assets/banners/summer-brew.svg', startDate: '2024-01-01', endDate: '2024-12-31', isActive: true, branchId: null },
-  { id: 'pr2', title: 'Weekend Pastry Bundle', description: 'Buy 2 pastries, get 1 free', discountPercent: 33, code: 'PASTRY3', bannerUrl: '/assets/banners/pastry-weekend.svg', startDate: '2024-06-01', endDate: '2024-08-31', isActive: true, branchId: null },
-  { id: 'pr3', title: 'Holiday Special', description: 'Free upsize on any drink', discountAmount: 30, code: 'HOLIDAY24', bannerUrl: '/assets/banners/holiday.svg', startDate: '2024-06-01', endDate: '2024-07-31', isActive: true, branchId: 'b1' },
+  { id: 'pr1', title: 'Happy Hour Brew', description: '20% off all iced drinks 2-5 PM', discountPercent: 20, code: 'HAPPY20', bannerUrl: '/assets/banners/summer-brew.svg', startDate: '2026-01-01', endDate: '2026-12-31', isActive: true, branchId: null },
+  { id: 'pr2', title: 'Weekend Pastry Bundle', description: 'Buy 2 pastries, get 1 free', discountPercent: 33, code: 'PASTRY3', bannerUrl: '/assets/banners/pastry-weekend.svg', startDate: '2026-06-01', endDate: '2026-08-31', isActive: true, branchId: null },
+  { id: 'pr3', title: 'Holiday Special', description: 'Free upsize on any drink', discountAmount: 30, code: 'HOLIDAY26', bannerUrl: '/assets/banners/holiday.svg', startDate: '2026-06-01', endDate: '2026-07-31', isActive: true, branchId: 'b1' },
 ];
 
 const mlModels = [
-  { id: 'ml1', name: 'Product Recommender v2.1', algorithm: 'collaborative_filtering', version: '2.1.0', accuracy: 0.8723, isActive: true, trainedAt: '2024-06-01T00:00:00Z' },
-  { id: 'ml2', name: 'Basket Analysis Engine', algorithm: 'association_rules', version: '1.4.0', accuracy: 0.8456, isActive: true, trainedAt: '2024-05-15T00:00:00Z' },
-  { id: 'ml3', name: 'Purchase Predictor RF', algorithm: 'random_forest', version: '3.0.1', accuracy: 0.8912, isActive: true, trainedAt: '2024-06-10T00:00:00Z' },
-  { id: 'ml4', name: 'XGBoost Ranker', algorithm: 'xgboost', version: '2.2.0', accuracy: 0.9034, isActive: true, trainedAt: '2024-06-12T00:00:00Z' },
+  { id: 'ml1', name: 'Product Recommender v2.1', algorithm: 'collaborative_filtering', version: '2.1.0', accuracy: 0.8723, isActive: true, trainedAt: '2026-06-01T00:00:00Z' },
+  { id: 'ml2', name: 'Basket Analysis Engine', algorithm: 'association_rules', version: '1.4.0', accuracy: 0.8456, isActive: true, trainedAt: '2026-05-15T00:00:00Z' },
+  { id: 'ml3', name: 'Purchase Predictor RF', algorithm: 'random_forest', version: '3.0.1', accuracy: 0.8912, isActive: true, trainedAt: '2026-06-10T00:00:00Z' },
+  { id: 'ml4', name: 'XGBoost Ranker', algorithm: 'xgboost', version: '2.2.0', accuracy: 0.9034, isActive: true, trainedAt: '2026-06-12T00:00:00Z' },
 ];
 
 const auditLogs = [
-  { id: 'al1', userId: 'u4', action: 'USER_CREATED', entityType: 'user', entityId: 'u5', details: { email: 'demo@brewsync.com' }, createdAt: '2024-06-10T09:00:00Z' },
-  { id: 'al2', userId: 'u4', action: 'PRODUCT_UPDATED', entityType: 'product', entityId: 'p1', details: { field: 'price', oldValue: 160, newValue: 165 }, createdAt: '2024-06-11T14:30:00Z' },
-  { id: 'al3', userId: 'u3', action: 'PROMOTION_CREATED', entityType: 'promotion', entityId: 'pr3', details: { title: 'New Branch Opening - BGC' }, createdAt: '2024-06-12T11:00:00Z' },
-  { id: 'al4', userId: 'u4', action: 'ML_MODEL_DEPLOYED', entityType: 'ml_model', entityId: 'ml4', details: { version: '2.2.0' }, createdAt: '2024-06-12T16:45:00Z' },
-  { id: 'al5', userId: 'u2', action: 'ORDER_COMPLETED', entityType: 'order', entityId: 'o1', details: { total: 369.6 }, createdAt: '2024-06-15T08:35:00Z' },
+  { id: 'al1', userId: 'u4', action: 'USER_CREATED', entityType: 'user', entityId: 'u5', details: { email: 'demo@brewsync.com' }, createdAt: '2026-06-10T09:00:00Z' },
+  { id: 'al2', userId: 'u4', action: 'PRODUCT_UPDATED', entityType: 'product', entityId: 'p1', details: { field: 'price', oldValue: 160, newValue: 165 }, createdAt: '2026-06-11T14:30:00Z' },
+  { id: 'al3', userId: 'u3', action: 'PROMOTION_CREATED', entityType: 'promotion', entityId: 'pr3', details: { title: 'New Branch Opening - BGC' }, createdAt: '2026-06-12T11:00:00Z' },
+  { id: 'al4', userId: 'u4', action: 'ML_MODEL_DEPLOYED', entityType: 'ml_model', entityId: 'ml4', details: { version: '2.2.0' }, createdAt: '2026-06-12T16:45:00Z' },
+  { id: 'al5', userId: 'u2', action: 'ORDER_COMPLETED', entityType: 'order', entityId: 'o1', details: { total: 369.6 }, createdAt: '2026-06-15T08:35:00Z' },
 ];
 
 function generateSalesAnalytics() {
